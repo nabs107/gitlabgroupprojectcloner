@@ -1,5 +1,5 @@
 {
-  "name": "gitlabprojectcloner",
+  "name": "gitlabgroupprojectcloner",
   "version": "1.0.0",
   "description": "This package clones project from gitlab.",
   "main": "index.js",
@@ -15,10 +15,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://gitlab.com/nabs107/gitlabprojectcloner.git"
+    "url": "git+https://gitlab.com/nabs107/gitlabprojectcloner.git"
   },
   "keywords": [
     "projectcloner",
     "gitlabprojectcloner"
-  ]
+  ],
+  "bugs": {
+    "url": "https://gitlab.com/nabs107/gitlabprojectcloner/issues"
+  },
+  "homepage": "https://gitlab.com/nabs107/gitlabprojectcloner#readme",
+  "devDependencies": {}
 }

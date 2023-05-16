@@ -1,16 +1,48 @@
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const axios = require('axios');
 const readline = require('readline');
 const { exec } = require('child_process');
 
-if (process.argv.length != 5) {
-    console.error('🛑 Please provide gitlab url, project id and access token in order');
-    process.exit(1);
+const configPath = path.join(os.homedir(), 'config.json');
+let config = {};
+
+if (fs.existsSync(configPath)) {
+    config = JSON.parse(fs.readFileSync(configPath));
+}
+
+if (!config.gitlab_url || !config.group_id || !config.access_token) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+
+    rl.question('Enter GitLab URL (e.g., https://gitlab.com): ', gitlabUrl => {
+        rl.question('Enter the group ID: ', groupId => {
+            rl.question('Enter the access token: ', accessToken => {
+                config.gitlab_url = gitlabUrl;
+                config.group_id = groupId;
+                config.access_token = accessToken;
+                fs.writeFileSync(configPath, JSON.stringify(config));
+
+                rl.close();
+                fetchProjects();
+            });
+        });
+    });
 } else {
-    let gitlabUrl = process.argv[2] + '';
-    let gitlabGroupId = process.argv[3] + '';
-    let gitlabProjectUrl = gitlabUrl + gitlabGroupId;
-    let accessToken = process.argv[4] + '';
-    axios.get(gitlabProjectUrl + '/projects?private_token=' + accessToken)
+    fetchProjects();
+}
+
+function fetchProjects() {
+    const { gitlab_url, group_id, access_token } = config;
+
+    console.log(gitlab_url, group_id, access_token);
+
+    let fullUrl = `${gitlab_url}/api/v4/groups/${group_id}/projects?private_token=${access_token}`;
+
+    axios.get(fullUrl)
         .then(response => {
             const projects = response.data;
 
@@ -51,6 +83,6 @@ if (process.argv.length != 5) {
 
         })
         .catch(error => {
-            console.log(error);
+            console.error('Error:', error.message);
         });
 }
